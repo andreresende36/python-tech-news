@@ -3,6 +3,8 @@ from time import sleep
 from parsel import Selector
 from bs4 import BeautifulSoup
 import re
+from tech_news.database import create_news
+from typing import Any
 
 
 # Requisito 1
@@ -29,20 +31,6 @@ def scrape_updates(html_content):
 def scrape_next_page_link(html_content):
     selector = Selector(html_content)
     return selector.css(".next::attr(href)").get()
-
-
-# headers = {
-#     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,
-# image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-#     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)
-# AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-# }
-# text = requests.get(
-#     "https://blog.betrybe.com/tecnologia/jogos-iniciantes-aprender-programar/",
-#     headers=headers,
-# ).text
-# with open("text.html", "w") as file:
-#     file.write(text)
 
 
 # Requisito 4
@@ -85,7 +73,27 @@ def scrape_news(html_content):
     }
 
 
+def fill_news_list(
+    news_urls: list[str], amount: int, news: list[dict[str, Any]]
+):
+    for new in news_urls:
+        if len(news) < amount:
+            news.append(scrape_news(fetch(new)))
+    return news
+
+
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
-    raise NotImplementedError
+    BASE_URL = "https://blog.betrybe.com"
+    news = []
+
+    while len(news) < amount:
+        response_HTML = fetch(BASE_URL)
+        news_urls = scrape_updates(response_HTML)
+        news = fill_news_list(news_urls, amount, news)
+        next_page_url = scrape_next_page_link(response_HTML)
+        if not next_page_url:
+            break
+        BASE_URL = next_page_url
+    create_news(news)
+    return news
