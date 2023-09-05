@@ -18,6 +18,3 @@ def test_reading_plan_group_news():
     reading_plan2 = ReadingPlanService()
     with pytest.raises(ValueError):
         reading_plan2.group_news_for_available_time(-10)
-
-
-# test_reading_plan_group_news()
