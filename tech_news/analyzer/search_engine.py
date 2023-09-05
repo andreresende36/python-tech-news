@@ -1,5 +1,4 @@
 from tech_news.database import find_news
-import re
 from datetime import datetime
 
 
