@@ -97,3 +97,6 @@ def get_tech_news(amount):
         BASE_URL = next_page_url
     create_news(news)
     return news
+
+
+get_tech_news(30)
