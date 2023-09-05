@@ -4,6 +4,7 @@ from tech_news.analyzer.reading_plan import (
 from tests.reading_plan.mocked_news import (
     mocked_news,
     expected_result_for_15_min,
+    expected_empty_unreadable,
 )  # type: ignore
 from unittest.mock import Mock
 import pytest
@@ -11,10 +12,12 @@ import pytest
 
 def test_reading_plan_group_news():
     reading_plan = ReadingPlanService()
-    reading_plan._db_news_proxy = Mock(return_value=mocked_news)
-    result = reading_plan.group_news_for_available_time(15)
-    assert result == expected_result_for_15_min
+    ReadingPlanService._db_news_proxy = Mock(return_value=mocked_news)
+    response = reading_plan.group_news_for_available_time(15)
+    assert response == expected_result_for_15_min
 
-    reading_plan2 = ReadingPlanService()
+    response_empty_unreadable = reading_plan.group_news_for_available_time(5)
+    assert response_empty_unreadable == expected_empty_unreadable
+
     with pytest.raises(ValueError):
-        reading_plan2.group_news_for_available_time(-10)
+        reading_plan.group_news_for_available_time(-10)
